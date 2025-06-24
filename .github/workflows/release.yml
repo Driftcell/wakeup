@@ -11,6 +11,9 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build for ${{ matrix.target }}
@@ -102,6 +105,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -119,7 +124,7 @@ jobs:
         cd ..
 
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: |
           artifacts/*/wakeup-*
@@ -144,8 +149,8 @@ jobs:
           请使用 `checksums.txt` 文件验证下载文件的完整性。
         draft: false
         prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        make_latest: true
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   test:
     name: Test
